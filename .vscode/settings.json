@@ -1,0 +1,18 @@
+{
+    "[python]" : { "editor.defaultFormatter": "ms-python.black-formatter", },
+    
+    "black-formatter.args": ["-l=88"],
+    "editor.codeActionsOnSave": { "source.fixAll": "explicit", "source.organizeImports": "explicit" },
+
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.fixAll": ["source.convertImportFormat", "source.unusedImports"],
+    "python.analysis.importFormat": "absolute",
+    "python.analysis.typeCheckingMode": "basic",
+
+    "cSpell.language": "en,pt-BR",
+    "cSpell.words": [
+        "dotenv",
+        "httpx",
+        "levelname"
+    ]
+}

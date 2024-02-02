@@ -1,0 +1,41 @@
+# Cache & Logs
+*cache*
+*log*
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# IPython
+profile_default/
+ipython_config.py
+
+# Poetry
+**/poetry.lock
+
+
+# Environments
+.env
+!.env.example
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# VS Code
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json

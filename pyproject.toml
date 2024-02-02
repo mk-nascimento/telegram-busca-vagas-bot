@@ -1,0 +1,38 @@
+[tool.poetry]
+name = "jobs-bot"
+version = "0.1.0"
+description = ""
+authors = ["Maksuel Nascimento <mk-nascimento@hotmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+python-dotenv = "^1.0.1"
+python-telegram-bot = { extras = ["job-queue"], version = "^20.7" }
+
+
+[tool.poetry.group.dev.dependencies]
+taskipy = "^1.12.2"
+blue = "^0.9.1"
+ruff = "^0.2.0"
+isort = "^5.13.2"
+ipython = "^8.21.0"
+
+
+[tool.ruff]
+line-length = 88
+exclude = ['.venv']
+
+[tool.isort]
+profile = "black"
+line_length = 88
+
+[tool.taskipy.tasks]
+lint = 'ruff . && blue --check . --diff'
+format = 'blue .  && isort .'
+run = 'poetry run ipython app/main.py'
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
