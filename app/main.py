@@ -1,28 +1,55 @@
 import logging
 
-from telegram import Update
+import telegram
+from telegram.constants import ParseMode
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 
-from app.settings import Settings
+from app import settings
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO,
 )
-logging.getLogger("httpx").setLevel(logging.WARNING)
+logging.getLogger('httpx').setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Sends a start message."""
+MARKDOWN = ParseMode.MARKDOWN
+
+
+async def start(
+    update: telegram.Update, context: ContextTypes.DEFAULT_TYPE
+) -> None:
+    """Initial Messages and Commands
+
+    Args:
+        update (telegram.Update)
+        context (ContextTypes.DEFAULT_TYPE)
+    """
     if update.effective_chat:
+        chat_id: int = update.effective_chat.id
+        message: telegram.Message | None = update.message
+        user_name: str = (
+            f', *{message.from_user.first_name}*'
+            if message and message.from_user
+            else ''
+        )
+
+        text = f'Olá{user_name}! Bem vindo ao Bot de busca de empregos.\n\n'
+        text += f'*Criado Por*: {settings.EnvVars.MARKDOWN_DEV_LINK}\n'
+
+        keyboard = [[telegram.KeyboardButton('/cadastrar')]]
+        keyboard += [[telegram.KeyboardButton('/remover')]]
+        keyboard += [[telegram.KeyboardButton('/limpar')]]
+        reply_markup = telegram.ReplyKeyboardMarkup(
+            keyboard, True, True, is_persistent=True
+        )
         await context.bot.send_message(
-            chat_id=update.effective_chat.id, text='Start Message'
+            chat_id, text, MARKDOWN, reply_markup=reply_markup
         )
 
 
 def main() -> None:
-    app = ApplicationBuilder().token(Settings.TOKEN).build()
-
+    app = ApplicationBuilder().token(settings.EnvVars.TOKEN).build()
     start_handler = CommandHandler('start', start)
     app.add_handler(start_handler)
 
