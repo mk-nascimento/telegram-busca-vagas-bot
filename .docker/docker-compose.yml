@@ -11,3 +11,4 @@ services:
         volumes:
             - ../app:/code/app
             - /code/.venv
+            - ../${PERSISTENCE}:/code/${PERSISTENCE}
