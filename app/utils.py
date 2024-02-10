@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 
 import pytz
+from telegram import Message
 
 BR_UTC: str = next(time for time in pytz.all_timezones if 'Sao_Paulo' in time)
 BR_TIMEZONE = pytz.timezone(BR_UTC)
@@ -23,3 +24,7 @@ def is_after_last_request(date: str) -> bool:
             boolean = iso >= utc - timedelta(hours=8)
 
     return boolean
+
+
+async def send_message_reply(msg: Message, text: str):
+    await msg.reply_markdown(text, False)
