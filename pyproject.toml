@@ -25,12 +25,11 @@ exclude = ['.venv']
 
 [tool.isort]
 profile = "black"
-line_length = 88
 
 [tool.taskipy.tasks]
-lint = 'ruff . && blue --check . --diff'
-format = 'blue .  && isort .'
-run = 'poetry run ipython app/main.py'
+lint = 'clear; ruff . && blue --check . --diff'
+format = 'clear; blue -l 88 . && isort .'
+start = 'clear; poetry run ipython -m app.main'
 
 
 [build-system]
