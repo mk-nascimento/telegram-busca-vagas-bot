@@ -1,8 +1,7 @@
 {
-    "[python]" : { "editor.defaultFormatter": "ms-python.black-formatter", },
-    
-    "black-formatter.args": ["-l=88"],
     "editor.codeActionsOnSave": { "source.fixAll": "explicit", "source.organizeImports": "explicit" },
+    "files.autoSave": "onFocusChange",
+    "files.autoSaveWhenNoErrors": true,
 
     "python.analysis.autoImportCompletions": true,
     "python.analysis.fixAll": ["source.convertImportFormat", "source.unusedImports"],
@@ -10,9 +9,5 @@
     "python.analysis.typeCheckingMode": "basic",
 
     "cSpell.language": "en,pt-BR",
-    "cSpell.words": [
-        "dotenv",
-        "httpx",
-        "levelname"
-    ]
+    "cSpell.words": ["dotenv", "gupy", "httpx", "levelname", "pytz"]
 }
