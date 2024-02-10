@@ -21,7 +21,7 @@ FIRST_REQ, SECOND_REQ = time(10, tzinfo=TZ), time(18, tzinfo=TZ)
 DAYS_TO_REQ = tuple(range(7))
 
 
-async def start(update: telegram.Update, context: ContextTypes.DEFAULT_TYPE):
+async def start(update: telegram.Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Initial Messages and Commands
 
     Parameters:
@@ -46,7 +46,7 @@ async def start(update: telegram.Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id, text)
 
 
-async def search(context: ContextTypes.DEFAULT_TYPE):
+async def search(context: ContextTypes.DEFAULT_TYPE) -> None:
     """Searches for jobs based on the provided keyword list.
 
     Parameters:
@@ -76,7 +76,7 @@ async def search(context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(chat_id, text, disable_web_page_preview=False)
 
 
-async def add(update: telegram.Update, context: ContextTypes.DEFAULT_TYPE):
+async def add(update: telegram.Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Command to add new keyword to search
 
     Parameters:
@@ -126,7 +126,7 @@ async def add(update: telegram.Update, context: ContextTypes.DEFAULT_TYPE):
         await send_message_reply(message, text)
 
 
-async def remove(update: telegram.Update, context: ContextTypes.DEFAULT_TYPE):
+async def remove(update: telegram.Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Command to remove a keyword to search
 
     Parameters:
@@ -166,7 +166,35 @@ async def remove(update: telegram.Update, context: ContextTypes.DEFAULT_TYPE):
         await send_message_reply(message, text)
 
 
-async def clear(update: telegram.Update, context: ContextTypes.DEFAULT_TYPE):
+async def keywords_list(
+    update: telegram.Update, context: ContextTypes.DEFAULT_TYPE
+) -> None:
+    """List available keywords.
+
+    Parameters:
+    update (telegram.Update): `PTB Update object`
+    context (ContextTypes.DEFAULT_TYPE): `PTB Context object`
+
+    Returns:
+    None: no returns
+    """
+
+    assert context.chat_data is not None and update.message
+    chat_data, message = context.chat_data, update.message
+    keywords: set[str] = chat_data.setdefault('keywords', set())
+
+    if not keywords:
+        text = (
+            'Não há buscas cadastradas!\n'
+            'Para cadastrar novas buscas digite `/cadastrar`.'
+        )
+        await send_message_reply(message, text)
+    else:
+        text = '\n'.join(f'•\t{k.upper()}' for k in keywords)
+        await send_message_reply(message, text)
+
+
+async def clear(update: telegram.Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Command to clear keyword list
 
     Parameters:
@@ -200,7 +228,7 @@ async def clear(update: telegram.Update, context: ContextTypes.DEFAULT_TYPE):
         await send_message_reply(message, text)
 
 
-async def unknown(update: telegram.Update, _: ContextTypes.DEFAULT_TYPE):
+async def unknown(update: telegram.Update, _: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle with unknown commands
 
     Parameters:

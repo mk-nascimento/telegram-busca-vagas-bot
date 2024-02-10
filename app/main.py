@@ -32,6 +32,7 @@ def main():
     app.add_handler(CommandHandler('start', handlers.start))
     app.add_handler(CommandHandler('cadastrar', handlers.add))
     app.add_handler(CommandHandler('remover', handlers.remove))
+    app.add_handler(CommandHandler('listar', handlers.keywords_list))
     app.add_handler(CommandHandler('limpar', handlers.clear))
     app.add_handler(MessageHandler(filters.ALL, handlers.unknown))
 
