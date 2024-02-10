@@ -30,6 +30,7 @@ profile = "black"
 lint = 'clear; ruff . && blue --check . --diff'
 format = 'clear; blue -l 88 . && isort .'
 start = 'clear; poetry run ipython -m app.main'
+export = 'poetry export --without-hashes -f requirements.txt -o requirements.txt'
 
 
 [build-system]
