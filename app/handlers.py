@@ -96,6 +96,7 @@ async def add(update: telegram.Update, context: ContextTypes.DEFAULT_TYPE) -> No
     if value:
         keywords: set[str] = chat_data.setdefault('keywords', set())
         keywords_len: int = len(keywords)
+        value = value.strip()
 
         if keywords_len == 10:
             text = (
@@ -108,7 +109,7 @@ async def add(update: telegram.Update, context: ContextTypes.DEFAULT_TYPE) -> No
         elif value in keywords:
             await send_message_reply(message, f'{value.upper()} já está cadastrada!')
         else:
-            keywords.add(value.strip().lower())
+            keywords.add(value.lower())
 
             text = (
                 f'Busca cadastrada com sucesso para `{value.upper()}`!\n\n'
