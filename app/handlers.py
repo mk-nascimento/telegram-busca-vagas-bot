@@ -18,7 +18,7 @@ COMMANDS: list[tuple[str, str]] = [
 
 TZ = BR_TIMEZONE
 FIRST_REQ, SECOND_REQ = time(10, tzinfo=TZ), time(18, tzinfo=TZ)
-DAYS_TO_REQ = tuple(range(7))
+DAYS_TO_REQ = tuple(range(5))
 
 
 async def start(update: telegram.Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -108,7 +108,7 @@ async def add(update: telegram.Update, context: ContextTypes.DEFAULT_TYPE) -> No
         elif value in keywords:
             await send_message_reply(message, f'{value.upper()} já está cadastrada!')
         else:
-            keywords.add(value.lower())
+            keywords.add(value.strip().lower())
 
             text = (
                 f'Busca cadastrada com sucesso para `{value.upper()}`!\n\n'
@@ -145,7 +145,7 @@ async def remove(update: telegram.Update, context: ContextTypes.DEFAULT_TYPE) ->
 
     if value:
         try:
-            keywords.remove(value.lower())
+            keywords.remove(value.strip().lower())
             await send_message_reply(message, f'`{value.upper()}` removido!')
             queues = queue.get_jobs_by_name(value)
             [q.schedule_removal() for q in queues]
