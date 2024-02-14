@@ -26,9 +26,16 @@ async def start(update: telegram.Update, context: ContextTypes.DEFAULT_TYPE) -> 
     user_name: str = f', _{from_user.first_name}_' if from_user else ''
 
     text = (
-        f'Olá{user_name}! Bem vindo ao Bot de busca de empregos.\n\n'
-        f'*Criado Por*: {settings.EnvVars.MARKDOWN_DEV_LINK}\n\n'
-        '_este bot utiliza o_ [Portal de Vagas da Gupy](https://portal.gupy.io/)\n'
+        f'Olá{user_name}! Bem vindo ao Bot de busca de empregos.'
+        '\n'
+        '_este bot utiliza o_ [Portal de Vagas da Gupy](https://portal.gupy.io/)'
+        '\n'
+        'Clique no ícone do `☰ Menu` para ver os comandos disponíveis'
+        '\n'
+        'Ou digite `/` para sugestão automática'
+        '\n\n'
+        f'*Criado Por*: {settings.EnvVars.MARKDOWN_DEV_LINK}'
+        '\n'
     )
 
     await context.bot.send_message(chat_id, text)
