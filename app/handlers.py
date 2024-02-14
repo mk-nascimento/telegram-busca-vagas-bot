@@ -1,24 +1,13 @@
 import logging
-from datetime import time
 
 import telegram
 from telegram.ext import ContextTypes
 
 from app import api_integration, settings
-from app.utils import BR_TIMEZONE, send_message_reply
+from app.constants import FIRST_REQ, SECOND_REQ, WORKDAYS
+from app.utils import send_message_reply
 
 logger = logging.getLogger(__name__)
-
-COMMANDS: list[tuple[str, str]] = [
-    ('listar', 'Este comando LISTA todas as "palavras-chave" já cadastradas'),
-    ('cadastrar', 'Este comando ADICIONA uma "palavra-chave" especificada'),
-    ('remover', 'Este comando REMOVE a "palavra-chave" especificada'),
-    ('limpar', 'Este comando REMOVE todas as "palavras-chave" cadastradas'),
-]
-
-TZ = BR_TIMEZONE
-FIRST_REQ, SECOND_REQ = time(10, tzinfo=TZ), time(18, tzinfo=TZ)
-DAYS_TO_REQ = tuple(range(5))
 
 
 async def start(update: telegram.Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -42,7 +31,6 @@ async def start(update: telegram.Update, context: ContextTypes.DEFAULT_TYPE) -> 
         '_este bot utiliza o_ [Portal de Vagas da Gupy](https://portal.gupy.io/)\n'
     )
 
-    await context.bot.set_my_commands(COMMANDS)
     await context.bot.send_message(chat_id, text)
 
 
@@ -116,8 +104,10 @@ async def add(update: telegram.Update, context: ContextTypes.DEFAULT_TYPE) -> No
                 f'Uma agenda de busca para `{value.upper()}` foi configurada'
             )
             await send_message_reply(message, text)
-            queue.run_daily(search, FIRST_REQ, DAYS_TO_REQ, None, value, chat_id)
-            queue.run_daily(search, SECOND_REQ, DAYS_TO_REQ, None, value, chat_id)
+            [
+                queue.run_daily(search, R, WORKDAYS, None, value, chat_id)
+                for R in [FIRST_REQ, SECOND_REQ]
+            ]
     else:
         text = (
             'Valor para busca não fornecido.\n'

@@ -3,13 +3,12 @@ from datetime import datetime, timedelta
 import pytz
 from telegram import Message
 
-BR_UTC: str = next(time for time in pytz.all_timezones if 'Sao_Paulo' in time)
-BR_TIMEZONE = pytz.timezone(BR_UTC)
+from app.constants import TZ
 
 
 def is_after_last_request(date: str) -> bool:
 
-    now: datetime = datetime.now(BR_TIMEZONE)
+    now: datetime = datetime.now(TZ)
     utc: datetime = now.astimezone(pytz.utc)
     utc = utc.replace(minute=0, second=0, microsecond=0, tzinfo=None)
 
