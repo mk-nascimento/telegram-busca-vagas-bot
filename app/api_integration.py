@@ -19,7 +19,7 @@ class RequestAPI:
 
         with self.client as client:
             query_params_keys = [k.value for k in AllowedQueryParams]
-            job_name, limit_key, offset_key, workplace = query_params_keys
+            job_name, limit_key, offset_key, workplace_type = query_params_keys
 
             query_params = {job_name: keyword, limit_key: 0}
             params = httpx.QueryParams(query_params)
@@ -34,7 +34,7 @@ class RequestAPI:
                 offset, total = int(page.get('offset', 0)), int(page.get('total', 0))
 
                 while offset < total:
-                    query_params.update({offset_key: offset, workplace: 'remote'})
+                    query_params.update({offset_key: offset, workplace_type: 'remote'})
                     query_params.pop(limit_key, None)
                     params = httpx.QueryParams(query_params)
 
@@ -45,7 +45,7 @@ class RequestAPI:
                     validation = [is_after_last_request(date) for date in str_dates]
 
                     is_all_new = all(validation)
-                    if not is_all_new:
+                    if is_all_new:
                         data.extend(jobs)
                         offset += 10
                         page = response.pagination
