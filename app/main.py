@@ -53,7 +53,7 @@ async def post_init(app: AppType):
 
 
 def main():
-    persistence = PicklePersistence('/env/PERSISTENCE')
+    persistence = PicklePersistence('env/PERSISTENCE')
     defaults = Defaults(ParseMode.MARKDOWN, False, False, None, TZ)
     app: AppType = (
         App()
