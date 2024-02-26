@@ -2,13 +2,11 @@ version: "3"
 
 services:
     app:
-        container_name: bot_app
+        container_name: bot
         build:
             context: ../
             target: runtime
         restart: "always"
         env_file: ../.env
         volumes:
-            - ../app:/code/app
-            - /code/.venv
-            - ../${PERSISTENCE}:/code/${PERSISTENCE}
+            - ../env/:/code/env/
