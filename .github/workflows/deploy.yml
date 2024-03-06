@@ -3,6 +3,7 @@ name: Deploy on pull request
 on:
   pull_request:
     branches: [main]
+    types: [closed]
 
 jobs:
   cloud-engine-deploy:
