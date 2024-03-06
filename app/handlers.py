@@ -5,7 +5,7 @@ from telegram.ext import ContextTypes
 
 from app import api_integration, settings
 from app.constants import FIRST_REQ, SECOND_REQ, WORKDAYS
-from app.utils import send_message_reply
+from app.utils import iso_to_br_datetime, send_message_reply
 
 logger = logging.getLogger(__name__)
 
@@ -41,6 +41,23 @@ async def start(update: telegram.Update, context: ContextTypes.DEFAULT_TYPE) -> 
     await context.bot.send_message(chat_id, text)
 
 
+async def clear_read_jobs(context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Clear previous read jobs based on the provided `read_jobs` list.
+
+    Parameters:
+    context (ContextTypes.DEFAULT_TYPE): `PTB Context object`
+
+    Returns:
+    None: no returns
+    """
+
+    assert context.chat_data
+
+    read_jobs: set[int] = context.chat_data.setdefault('read_jobs', set())
+    if read_jobs:
+        read_jobs.clear()
+
+
 async def search(context: ContextTypes.DEFAULT_TYPE) -> None:
     """Searches for jobs based on the provided keyword list.
 
@@ -51,24 +68,34 @@ async def search(context: ContextTypes.DEFAULT_TYPE) -> None:
     None: no returns
     """
 
-    assert context.job
+    assert context.chat_data and context.job
     api = api_integration.RequestAPI(settings.EnvVars.API_URL)
     chat_id, name = int(context.job.chat_id or 000000000), str(context.job.name)
-
-    jobs = await api.search_jobs(name)
-    if not jobs:
-        text = f'Não foram encontradas novas vagas para `{name.upper()}`'
-        await context.bot.send_message(chat_id, text)
+    chat_data = context.chat_data
 
     keyword = '_'.join(name.split()).replace('_', r'\_')
+
+    jobs = await api.search_jobs(name)
     for job in jobs:
-        text = (
-            f'#{keyword}\n\n'
-            f'*Título da Vaga*: _{job["name"]}_\n\n'
-            f'*Company*: [{job["careerPageName"]}]({job["careerPageUrl"]})\n\n'
-            f'[CADASTRE-SE]({job["jobUrl"]})'
-        )
-        await context.bot.send_message(chat_id, text, disable_web_page_preview=False)
+        read_jobs: set[int] = chat_data.setdefault('read_jobs', set())
+        if job['id'] not in read_jobs:
+            published_date = iso_to_br_datetime(job['publishedDate'])
+            text = (
+                f'#{keyword}'
+                '\n\n'
+                f'*Título da Vaga*: _{job["name"]}_'
+                '\n'
+                f'*Publicada em*: `{published_date}`'
+                '\n'
+                f'*Company*: [{job["careerPageName"]}]({job["careerPageUrl"]})'
+                '\n\n'
+                f'[CADASTRE-SE]({job["jobUrl"]})'
+            )
+            await context.bot.send_message(
+                chat_id, text, disable_web_page_preview=False
+            )
+
+        read_jobs.add(job['id'])
 
 
 async def add(update: telegram.Update, context: ContextTypes.DEFAULT_TYPE) -> None:
