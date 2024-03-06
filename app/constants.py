@@ -24,5 +24,7 @@ TZ = pytz.timezone(BR_UTC)
 
 # 10 AM and 6 PM in Brasilia time zone.
 FIRST_REQ, SECOND_REQ = time(10, tzinfo=TZ), time(18, tzinfo=TZ)
+# MidNight
+MIDNIGHT = time(0, tzinfo=TZ)
 # Define the days for requests, considering Monday to Friday.
 WORKDAYS = tuple(range(1, 6))

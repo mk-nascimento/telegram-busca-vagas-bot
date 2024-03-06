@@ -6,7 +6,15 @@ from telegram.ext import CommandHandler, Defaults, MessageHandler, PicklePersist
 from telegram.ext.filters import ALL
 
 from app import handlers, settings
-from app.constants import COMMANDS, FIRST_REQ, SECOND_REQ, TZ, WORKDAYS, AppType
+from app.constants import (
+    COMMANDS,
+    FIRST_REQ,
+    MIDNIGHT,
+    SECOND_REQ,
+    TZ,
+    WORKDAYS,
+    AppType,
+)
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -38,6 +46,8 @@ async def post_init(app: AppType):
             continue
 
         chat_data = app.chat_data[id]
+
+        logger.info(chat_data)
         keywords: set[str] = chat_data.setdefault('keywords', set())
 
         [
@@ -47,6 +57,9 @@ async def post_init(app: AppType):
             ]
             for TIME in [FIRST_REQ, SECOND_REQ]
         ]
+        app.job_queue.run_daily(
+            handlers.clear_read_jobs, MIDNIGHT, WORKDAYS, chat_id=id
+        )
 
     [app.drop_chat_data(id) for id in chats_to_delete]
     await app.bot.set_my_commands(COMMANDS)
