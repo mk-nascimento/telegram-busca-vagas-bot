@@ -1,0 +1,35 @@
+name: Deploy on pull request
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  cloud-engine-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Export container PERSISTENCE file
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            jump ${{ secrets.PROJECT_DOCKER_MARK }}
+
+            docker compose exec app cat env/PERSISTENCE > ${{ secrets.PERSISTENCE_DEPENDENCY }}
+
+      - name: Update project
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            jump ${{ secrets.PROJECT_MARK }}
+            cat ${{ secrets.PERSISTENCE_DEPENDENCY }} > env/PERSISTENCE
+
+            git pull --rebase origin main
+
+            make compose-up
