@@ -47,7 +47,6 @@ async def post_init(app: AppType):
 
         chat_data = app.chat_data[id]
 
-        logger.info(chat_data)
         keywords: set[str] = chat_data.setdefault('keywords', set())
 
         [
