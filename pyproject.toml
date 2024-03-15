@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "telegram-busca-vagas-bot"
-version = "1.0.4"
+version = "1.1.0"
 description = ""
 authors = ["Maksuel Nascimento <mk-nascimento@hotmail.com>"]
 readme = "README.md"
