@@ -14,14 +14,14 @@ def is_after_last_request(date: str) -> bool:
     iso: datetime = datetime.fromisoformat(date[:-1])
     iso = iso.replace(minute=0, second=0, microsecond=0, tzinfo=None)
 
-    boolean: bool = False
+    days_before = 3 if now.isoweekday() == 1 else 1
     match now.hour:
         case _ if 10 <= now.hour < 18:
-            boolean = iso >= utc - timedelta(days=1) + timedelta(hours=8)
+            return iso >= utc - timedelta(days_before) + timedelta(hours=8)
         case _ if now.hour >= 18 or now.hour < 10:
-            boolean = iso >= utc - timedelta(hours=8)
-
-    return boolean
+            return iso >= utc - timedelta(hours=8)
+        case _:
+            return False
 
 
 def iso_to_br_datetime(date: str) -> str:
