@@ -1,12 +1,10 @@
-version: "3"
-
 services:
-    app:
-        container_name: bot
-        build:
-            context: ../
-            target: runtime
-        restart: "always"
-        env_file: ../.env
-        volumes:
-            - ../env/:/code/env/
+  app:
+    container_name: bot
+    build:
+      context: ../
+      target: runtime
+    restart: "always"
+    env_file: ../.env
+    volumes:
+      - ../env/:/code/env/
