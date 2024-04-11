@@ -1,0 +1,72 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/python
+{
+	"name": "devcontainer--telegram-busca-vagas-bot",
+	"dockerComposeFile": ["../.docker/docker-compose.yml", "docker-compose.devcontainer.yml"],
+	"service": "app",
+
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	"features": {},
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	"forwardPorts": [],
+
+	// Use 'postCreateCommand' to run commands after the container is created.
+	"postCreateCommand": "poetry install -nq --no-ansi",
+
+	// Configure tool-specific properties.
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"aaron-bond.better-comments",
+				"bierner.color-info",
+				"dotenv.dotenv-vscode",
+				"eamodio.gitlens",
+				"editorconfig.editorconfig",
+				"foxundermoon.shell-format",
+				"magicstack.magicpython",
+				"ms-azuretools.vscode-docker",
+				"ms-python.autopep8",
+				"ms-python.black-formatter",
+				"ms-python.debugpy",
+				"ms-python.isort",
+				"ms-python.python",
+				"ms-python.vscode-pylance",
+				"mtxr.sqltools",
+				"natqe.reload",
+				"oderwat.indent-rainbow",
+				"redhat.vscode-yaml",
+				"sonarsource.sonarlint-vscode",
+				"streetsidesoftware.code-spell-checker-portuguese-brazilian",
+				"streetsidesoftware.code-spell-checker",
+				"tamasfe.even-better-toml",
+				"visualstudioexptteam.vscodeintellicode"
+			],
+			"settings": {
+				"cSpell.ignorePaths": [
+					".devcontainer",
+					".docker",
+					".git/objects",
+					".vscode-insiders",
+					".vscode",
+					"node_modules",
+					"package-lock.json",
+					"vscode-extension"
+				],
+				"better-comments.multilineComments": true,
+				"python.analysis.autoFormatStrings": true,
+				"python.analysis.autoImportCompletions": true,
+				"python.analysis.autoSearchPaths": true,
+				"python.analysis.fixAll": ["source.unusedImports", "source.convertImportFormat"],
+				"remote.autoForwardPorts": false,
+				"terminal.integrated.defaultLocation": "view"
+			}
+		} 
+	},
+
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "root",
+
+	"shutdownAction": "stopCompose",
+	"workspaceFolder": "/workspace"
+}
