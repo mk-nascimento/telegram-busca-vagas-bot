@@ -1,9 +1,9 @@
 import logging
-from http.client import HTTPException
 
-import httpx
+import requests
 
-from app.models import AllowedQueryParams, ApiResponse, Job
+from app.exceptions import ExtendedException
+from app.models import AllowedQueryParams, ApiResponse, Job, Pagination
 from app.utils import is_after_last_request
 
 logger = logging.getLogger(__name__)
@@ -12,48 +12,50 @@ logger = logging.getLogger(__name__)
 class RequestAPI:
     def __init__(self, base_url: str) -> None:
         self.base_url = base_url
-        self.client = httpx.Client()
+        self.client = requests.Session()
 
     async def search_jobs(self, keyword: str) -> list[Job]:
-        base_url = self.base_url
+        url = self.base_url
 
         with self.client as client:
-            query_params_keys = [k.value for k in AllowedQueryParams]
-            job_name, limit_key, offset_key, workplace_type = query_params_keys
-
-            query_params = {job_name: keyword, limit_key: 0}
-            params = httpx.QueryParams(query_params)
+            name, limit, off, workplace = [k.value for k in AllowedQueryParams]
+            params = {name: keyword, limit: 0}
 
             try:
                 data: list[Job] = []
 
-                _res: ApiResponse = client.get(base_url, params=params).json()
-                response = ApiResponse(**_res)
+                r = client.get(url, params=params)
+                r.raise_for_status()
+                res = ApiResponse(**r.json())
 
-                page = response.pagination
-                offset, total = int(page.get('offset', 0)), int(page.get('total', 0))
+                page = Pagination(**res.pagination)
+                offset, total = page.offset, page.total
 
-                while offset < total:
-                    query_params.update({offset_key: offset, workplace_type: 'remote'})
-                    query_params.pop(limit_key, None)
-                    params = httpx.QueryParams(query_params)
+                while int(offset) < int(total):
+                    params.update({off: offset, workplace: 'hybrid,remote'})
+                    params.pop(limit, None)
 
-                    _res = client.get(base_url, params=params).json()
-                    response, jobs = ApiResponse(**_res), [j for j in response.data]
+                    r = client.get(url, params=params)
+                    r.raise_for_status()
+                    res = ApiResponse(**r.json())
 
-                    str_dates: list[str] = [job['publishedDate'] for job in jobs]
-                    validation = [is_after_last_request(date) for date in str_dates]
-
-                    is_all_new = all(validation)
-                    if is_all_new:
-                        data.extend(jobs)
+                    dates: list[str] = [d['publishedDate'] for d in res.data]
+                    validation = [is_after_last_request(d) for d in dates]
+                    if all(validation):
+                        data.extend(res.data)
                         offset += 10
-                        page = response.pagination
+                        page = res.pagination
                     else:
-                        data.extend([j for j in jobs if (
-                            is_after_last_request(j['publishedDate']))])
+                        data.extend(
+                            [
+                                d
+                                for d in res.data
+                                if (is_after_last_request(d['publishedDate']))
+                            ]
+                        )
                         offset = total
 
                 return data
-            except HTTPException as e:
-                raise HTTPException('Request Failed') from e
+
+            except Exception as e:
+                raise ExtendedException('Error processing request') from e

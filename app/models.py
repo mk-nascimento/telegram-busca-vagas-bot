@@ -1,7 +1,8 @@
 from dataclasses import dataclass, field
 from enum import Enum
 
-import httpx
+import httpcore
+import requests
 
 
 @dataclass
@@ -17,7 +18,7 @@ class Job(dict):
     description: str
     careerPageId: int
     careerPageName: str
-    careerPageLogo: httpx.URL
+    careerPageLogo: httpcore.URL
     type: str
     publishedDate: str
     applicationDeadline: str
@@ -25,11 +26,11 @@ class Job(dict):
     city: str
     state: str
     country: str
-    jobUrl: httpx.URL
+    jobUrl: httpcore.URL
     badges: Badges
     disabilities: bool
     workplaceType: str
-    careerPageUrl: httpx.URL
+    careerPageUrl: httpcore.URL
 
 
 @dataclass
@@ -40,7 +41,7 @@ class Pagination(dict):
 
 
 @dataclass
-class ApiResponse(dict):
+class ApiResponse(requests.models.Response):
     pagination: Pagination
     data: list[Job] = field(default_factory=list)
 
