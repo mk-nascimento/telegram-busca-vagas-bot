@@ -39,3 +39,6 @@ venv.bak/
 .vscode/*
 !.vscode/extensions.json
 !.vscode/settings.json
+
+# Persistence File
+**/PERSISTENCE
