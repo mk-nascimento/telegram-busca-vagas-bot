@@ -1,9 +1,12 @@
+import textwrap
 from datetime import datetime, timedelta
+from typing import Callable
 
 import pytz
 from telegram import Message
 
 from app.constants import TZ
+from app.models import Job
 
 
 def is_after_last_request(date: str) -> bool:
@@ -30,5 +33,28 @@ def iso_to_br_datetime(date: str) -> str:
     return iso.astimezone(TZ).strftime('%d/%m/%Y %H:%M:%S')
 
 
+def text_format(text: str):
+    return textwrap.dedent(text)
+
+
 async def send_message_reply(msg: Message, text: str):
-    await msg.reply_markdown(text, False)
+    await msg.reply_markdown(text_format(text), False)
+
+
+def formatted_job_message(job: Job):
+    rep: Callable[[str], str] = lambda to_replace: '_'.join(to_replace.split())
+    job_names = [f'`{rep(key)}`' for key in sorted(job['keywords'])]
+
+    return text_format(
+        f"""
+
+        *Título da Vaga*: _{job["name"]}_
+
+        *Encontrada para*: {' • '.join(job_names)}
+
+        *Publicada em*: `{iso_to_br_datetime(job['publishedDate'])}`
+
+        *Company*: [{job["careerPageName"]}]({job["careerPageUrl"]})
+
+        [CADASTRE-SE]({job["jobUrl"]})"""
+    )

@@ -19,7 +19,7 @@ jobs:
           script: |
             cd ${{ secrets.PROJECT_DOCKER_PATH }}
 
-            docker compose exec app cat env/PERSISTENCE > ${{ secrets.PERSISTENCE_DEPENDENCY }}
+            docker compose exec app cat app/PERSISTENCE > ${{ secrets.PERSISTENCE_DEPENDENCY }}
 
       - name: Update project
         uses: appleboy/ssh-action@master
@@ -29,7 +29,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd ${{ secrets.PROJECT_DOCKER_PATH }}
-            cat ${{ secrets.PERSISTENCE_DEPENDENCY }} > env/PERSISTENCE
+            cat ${{ secrets.PERSISTENCE_DEPENDENCY }} > app/PERSISTENCE
 
             git pull --rebase origin main
 

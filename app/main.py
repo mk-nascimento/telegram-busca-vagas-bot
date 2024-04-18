@@ -6,22 +6,12 @@ from telegram.ext import CommandHandler, Defaults, MessageHandler, PicklePersist
 from telegram.ext.filters import ALL
 
 from app import handlers, settings
-from app.constants import (
-    COMMANDS,
-    FIRST_REQ,
-    MIDNIGHT,
-    SECOND_REQ,
-    TZ,
-    WORKDAYS,
-    AppType,
-)
+from app.constants import COMMANDS, FIRST_REQ, SECOND_REQ, TZ, WORKDAYS, AppType
 
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO,
-)
+FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+logging.basicConfig(format=FORMAT, level=logging.INFO)
 logging.getLogger('httpx').setLevel(logging.WARNING)
-logger = logging.getLogger(__name__)
+logging.getLogger(__name__)
 
 
 async def post_init(app: AppType):
@@ -40,32 +30,19 @@ async def post_init(app: AppType):
     for id in app.chat_data.keys():
         try:
             await app.bot.get_chat(id)
-        except Exception as e:
-            logger.error(f'{e=}')
+        except Exception:
             chats_to_delete.add(id)
             continue
 
-        chat_data = app.chat_data[id]
-
-        keywords: set[str] = chat_data.setdefault('keywords', set())
-
-        [
-            [
-                app.job_queue.run_daily(handlers.search, TIME, WORKDAYS, None, key, id)
-                for key in keywords
-            ]
-            for TIME in [FIRST_REQ, SECOND_REQ]
-        ]
-        app.job_queue.run_daily(
-            handlers.clear_read_jobs, MIDNIGHT, WORKDAYS, chat_id=id
-        )
+        run = lambda q, cb, time, id: q.run_daily(cb, time, WORKDAYS, None, None, id)
+        [run(app.job_queue, handlers.search, T, id) for T in [FIRST_REQ, SECOND_REQ]]
 
     [app.drop_chat_data(id) for id in chats_to_delete]
     await app.bot.set_my_commands(COMMANDS)
 
 
 def main():
-    persistence = PicklePersistence('env/PERSISTENCE')
+    persistence = PicklePersistence('app/PERSISTENCE')
     defaults = Defaults(ParseMode.MARKDOWN, False, False, None, TZ)
     app: AppType = (
         App()

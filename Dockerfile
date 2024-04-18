@@ -8,13 +8,10 @@ RUN poetry install -nq --no-ansi --no-dev
 
 FROM python:3.11-alpine AS runtime
 ENV PACKAGES=/usr/local/lib/python3.11/site-packages
-WORKDIR /code
-
-RUN mkdir env
 
 COPY --from=build "$PACKAGES" "$PACKAGES"
 COPY .env .
-COPY app/ ./app
+COPY app/ /app
 
 CMD python -m app.main
 
@@ -33,8 +30,5 @@ EOF
 RUN bash -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh)"
 RUN sed -i 's/OSH_THEME=.*/OSH_THEME=vscode/' ~/.bashrc
 
-RUN <<EOF
-git config --global --add safe.directory /workspace
-python3 -m pip install poetry~=1.7
-mkdir -p env
-EOF
+RUN git config --global --add safe.directory /workspace
+RUN python3 -m pip install poetry~=1.7
