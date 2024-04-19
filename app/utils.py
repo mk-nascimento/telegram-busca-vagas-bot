@@ -56,5 +56,6 @@ def formatted_job_message(job: Job):
 
         *Company*: [{job["careerPageName"]}]({job["careerPageUrl"]})
 
-        [CADASTRE-SE]({job["jobUrl"]})"""
+        [CADASTRE-SE]({job["jobUrl"]})
+        """
     )
