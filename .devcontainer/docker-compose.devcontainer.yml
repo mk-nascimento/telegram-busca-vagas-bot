@@ -10,7 +10,7 @@ services:
     volumes:
       - ../:/workspace:cached
       - /var/run/docker.sock:/var/run/docker.sock
-      - vscode:/vscode/
+      - vscode:/vscode
     restart: "no"
   # ...
 volumes:
