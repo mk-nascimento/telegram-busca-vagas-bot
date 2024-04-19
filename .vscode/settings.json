@@ -1,13 +1,15 @@
 {
+    "better-comments.multilineComments": true,
+    "cSpell.ignorePaths": [".devcontainer",".docker",".env*",".github",".vscode"],
+    "cSpell.language": "en,pt-BR",
+    "cSpell.words": ["dotenv","gupy","httpx","levelname","pytz"],
     "editor.codeActionsOnSave": { "source.fixAll": "explicit", "source.organizeImports": "explicit" },
     "files.autoSave": "onFocusChange",
     "files.autoSaveWhenNoErrors": true,
-
+    "python.analysis.autoFormatStrings": true,
     "python.analysis.autoImportCompletions": true,
-    "python.analysis.fixAll": ["source.convertImportFormat", "source.unusedImports"],
+    "python.analysis.autoSearchPaths": true,
+    "python.analysis.fixAll": ["source.convertImportFormat","source.unusedImports"],
     "python.analysis.importFormat": "absolute",
-    "python.analysis.typeCheckingMode": "basic",
-
-    "cSpell.language": "en,pt-BR",
-    "cSpell.words": ["dotenv", "gupy", "httpx", "levelname", "pytz"]
+    "python.analysis.typeCheckingMode": "basic"
 }
