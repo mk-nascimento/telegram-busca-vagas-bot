@@ -34,7 +34,7 @@ async def post_init(app: AppType):
             chats_to_delete.add(id)
             continue
 
-        run = lambda q, cb, time, id: q.run_daily(cb, time, WORKDAYS, None, None, id)
+        run = lambda q, cb, time, id: q.run_daily(cb, time, WORKDAYS, chat_id=id)
         [run(app.job_queue, handlers.search, T, id) for T in [FIRST_REQ, SECOND_REQ]]
 
     [app.drop_chat_data(id) for id in chats_to_delete]

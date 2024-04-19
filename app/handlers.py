@@ -75,9 +75,12 @@ async def search(context: ContextTypes.DEFAULT_TYPE) -> None:
         rep = lambda to_replace: to_replace.replace(' ', '_')
         formatted_jobs = [formatted_job_message(job) for job in split[work]]
         group_by = {'hybrid': 'vagas híbridas', 'remote': 'vagas remotas'}
-        text = f'*#{rep(group_by[work].upper())}* {"".join(formatted_jobs)}'
 
-        await context.bot.send_message(chat_id, text, disable_web_page_preview=True)
+        for i in range(0, len(formatted_jobs), 10):
+            jobs = formatted_jobs[i : i + min(i + 10, len(formatted_jobs) - 1)]
+            result = f'{int(i/10)+1}/{(len(formatted_jobs)+9)//10}'
+            text = f'*#{rep(group_by[work].upper())}* `{result}` {"".join(jobs)}'
+            await context.bot.send_message(chat_id, text, disable_web_page_preview=True)
 
     if no_results:
         text = 'Não foram encontradas novas vagas para:***'
