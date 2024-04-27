@@ -1,5 +1,6 @@
 import logging
 
+from telegram import LinkPreviewOptions
 from telegram.constants import ParseMode
 from telegram.ext import ApplicationBuilder as App
 from telegram.ext import CommandHandler, Defaults, MessageHandler, PicklePersistence
@@ -26,41 +27,40 @@ async def post_init(app: AppType):
 
     assert app.job_queue
 
-    chats_to_delete: set[int] = set()
     for id in app.chat_data.keys():
         try:
             await app.bot.get_chat(id)
         except Exception:
-            chats_to_delete.add(id)
+            app.drop_chat_data(id)
             continue
 
         run = lambda q, cb, time, id: q.run_daily(cb, time, WORKDAYS, chat_id=id)
         [run(app.job_queue, handlers.search, T, id) for T in [FIRST_REQ, SECOND_REQ]]
 
-    [app.drop_chat_data(id) for id in chats_to_delete]
     await app.bot.set_my_commands(COMMANDS)
 
 
 def main():
-    persistence = PicklePersistence('app/PERSISTENCE')
-    defaults = Defaults(ParseMode.MARKDOWN, False, False, None, TZ)
-    app: AppType = (
+    PERSISTENCE = PicklePersistence('app/PERSISTENCE')
+    LPO = LinkPreviewOptions(False, prefer_small_media=True, show_above_text=True)
+    DEFAULTS = Defaults(ParseMode.MARKDOWN, link_preview_options=LPO, tzinfo=TZ)
+    APP: AppType = (
         App()
         .token(settings.EnvVars.TOKEN)
-        .persistence(persistence)
-        .defaults(defaults)
+        .persistence(PERSISTENCE)
+        .defaults(DEFAULTS)
         .post_init(post_init)
         .build()
     )
 
-    app.add_handler(CommandHandler('start', handlers.start))
-    app.add_handler(CommandHandler('cadastrar', handlers.add))
-    app.add_handler(CommandHandler('remover', handlers.remove))
-    app.add_handler(CommandHandler('listar', handlers.keywords_list))
-    app.add_handler(CommandHandler('limpar', handlers.clear))
-    app.add_handler(MessageHandler(ALL, handlers.unknown))
+    APP.add_handler(CommandHandler('start', handlers.start))
+    APP.add_handler(CommandHandler('cadastrar', handlers.add))
+    APP.add_handler(CommandHandler('remover', handlers.remove))
+    APP.add_handler(CommandHandler('listar', handlers.keywords_list))
+    APP.add_handler(CommandHandler('limpar', handlers.clear))
+    APP.add_handler(MessageHandler(ALL, handlers.unknown))
 
-    app.run_polling()
+    APP.run_polling()
 
 
 if __name__ == '__main__':
