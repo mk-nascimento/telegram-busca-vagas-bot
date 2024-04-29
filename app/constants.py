@@ -5,7 +5,7 @@ import pytz
 from telegram.ext import Application, CallbackContext, ExtBot, JobQueue
 
 ADict = Dict[Any, Any]
-AppType = Application[ExtBot[None], CallbackContext, ADict, ADict, ADict, JobQueue]
+APP_TYPE = Application[ExtBot[None], CallbackContext, ADict, ADict, ADict, JobQueue]
 
 
 # List of bot commands with descriptions.
@@ -22,8 +22,10 @@ BR_UTC: str = next(time for time in pytz.all_timezones if 'Sao_Paulo' in time)
 TZ = pytz.timezone(BR_UTC)
 
 
+# 8 AM daily check
+CHECK_TIME = time(8, tzinfo=TZ)
 # 10 AM and 6 PM in Brasilia time zone.
-FIRST_REQ, SECOND_REQ = time(10, tzinfo=TZ), time(18, tzinfo=TZ)
+TIME_REQUESTS = time(10, tzinfo=TZ), time(18, tzinfo=TZ)
 # MidNight
 MIDNIGHT = time(0, tzinfo=TZ)
 # Define the days for requests, considering Monday to Friday.
