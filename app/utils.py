@@ -4,8 +4,10 @@ from typing import Callable
 
 import pytz
 from telegram import Message
+from telegram.error import Forbidden
+from telegram.ext import ExtBot
 
-from app.constants import TZ
+from app.constants import APP_TYPE, TZ
 from app.models import Job
 
 
@@ -59,3 +61,13 @@ def formatted_job_message(job: Job):
         [CADASTRE-SE]({job["jobUrl"]})
         """
     )
+
+
+async def send_job_messages(app: APP_TYPE, bot: ExtBot[None], id: int, text: str):
+    try:
+        await bot.send_message(id, text ,disable_web_page_preview=True)
+    except Forbidden as exc:
+        if 'bot was blocked by the user' in exc.message.lower():
+            app.drop_chat_data(id)
+            app.drop_user_data(id)
+            raise Forbidden(exc.message) from exc

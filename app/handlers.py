@@ -5,7 +5,7 @@ import telegram
 from telegram.ext import ContextTypes
 
 from app import api_integration, settings
-from app.utils import formatted_job_message, send_message_reply
+from app.utils import formatted_job_message, send_job_messages, send_message_reply
 
 logger = logging.getLogger(__name__)
 
@@ -49,7 +49,7 @@ async def search(context: ContextTypes.DEFAULT_TYPE) -> None:
 
     assert context.chat_data and context.job
     api = api_integration.RequestAPI(settings.EnvVars.API_URL)
-    chat_data, chat_id = context.chat_data, int(context.job.chat_id or 000000000)
+    chat_data, ID = context.chat_data, int(context.job.chat_id or 000000000)
     keywords: set[str] = chat_data.setdefault('keywords', set())
 
     line, no_results, split = '\n', set(), defaultdict(list)
@@ -80,12 +80,12 @@ async def search(context: ContextTypes.DEFAULT_TYPE) -> None:
             jobs = formatted_jobs[i : i + min(i + 10, len(formatted_jobs) - 1)]
             result = f'{int(i/10)+1}/{(len(formatted_jobs)+9)//10}'
             text = f'*#{rep(group_by[work].upper())}* `{result}` {"".join(jobs)}'
-            await context.bot.send_message(chat_id, text, disable_web_page_preview=True)
+            await send_job_messages(context.application,context.bot,ID,text)
 
     if no_results:
         text = 'Não foram encontradas novas vagas para:***'
         text += f'`{line.join(f"• {n.upper()}" for n in no_results)}`'
-        await context.bot.send_message(chat_id, text.replace('***', line * 2))
+        await context.bot.send_message(ID, text.replace('***', line * 2))
 
 
 async def add(update: telegram.Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -248,3 +248,26 @@ async def unknown(update: telegram.Update, _: ContextTypes.DEFAULT_TYPE) -> None
         Ou digite `/` para sugestão automática"""
 
     await send_message_reply(update.message, text)
+
+
+async def daily_check(context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Daily check for `chat_data`.
+
+    Parameters:
+    context (ContextTypes.DEFAULT_TYPE): `PTB Context object`
+
+    Returns:
+    None: no returns
+    """
+
+    drops: set[int] = set()
+    async with context.application as app:
+        for id in app.chat_data.keys():
+            await context.bot.get_chat(id)
+            try:
+                await app.bot.get_chat(id)
+                if not app.chat_data[id].get('keywords'):
+                    drops.add(id)
+            except Exception:
+                drops.add(id)
+        [app.drop_chat_data(id) for id in drops]
