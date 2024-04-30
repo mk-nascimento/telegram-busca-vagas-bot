@@ -22,8 +22,6 @@ BR_UTC: str = next(time for time in pytz.all_timezones if 'Sao_Paulo' in time)
 TZ = pytz.timezone(BR_UTC)
 
 
-# 8 AM daily check
-CHECK_TIME = time(8, tzinfo=TZ)
 # 10 AM and 6 PM in Brasilia time zone.
 TIME_REQUESTS = time(10, tzinfo=TZ), time(18, tzinfo=TZ)
 # MidNight
