@@ -80,7 +80,7 @@ async def search(context: ContextTypes.DEFAULT_TYPE) -> None:
             jobs = formatted_jobs[i : i + min(i + 10, len(formatted_jobs) - 1)]
             result = f'{int(i/10)+1}/{(len(formatted_jobs)+9)//10}'
             text = f'*#{rep(group_by[work].upper())}* `{result}` {"".join(jobs)}'
-            await send_job_messages(context.application,context.bot,ID,text)
+            await send_job_messages(context.application, context.bot, ID, text)
 
     if no_results:
         text = 'Não foram encontradas novas vagas para:***'
@@ -248,26 +248,3 @@ async def unknown(update: telegram.Update, _: ContextTypes.DEFAULT_TYPE) -> None
         Ou digite `/` para sugestão automática"""
 
     await send_message_reply(update.message, text)
-
-
-async def daily_check(context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Daily check for `chat_data`.
-
-    Parameters:
-    context (ContextTypes.DEFAULT_TYPE): `PTB Context object`
-
-    Returns:
-    None: no returns
-    """
-
-    drops: set[int] = set()
-    async with context.application as app:
-        for id in app.chat_data.keys():
-            await context.bot.get_chat(id)
-            try:
-                await app.bot.get_chat(id)
-                if not app.chat_data[id].get('keywords'):
-                    drops.add(id)
-            except Exception:
-                drops.add(id)
-        [app.drop_chat_data(id) for id in drops]

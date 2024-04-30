@@ -7,7 +7,7 @@ from telegram.ext import CommandHandler, Defaults, MessageHandler, PicklePersist
 from telegram.ext.filters import ALL
 
 from app import error_handler, handlers, settings
-from app.constants import APP_TYPE, CHECK_TIME, COMMANDS, TIME_REQUESTS, TZ, WORKDAYS
+from app.constants import APP_TYPE, COMMANDS, TIME_REQUESTS, TZ, WORKDAYS
 
 FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 logging.basicConfig(format=FORMAT, level=logging.INFO)
@@ -19,7 +19,8 @@ async def post_init(app: APP_TYPE):
     """Perform post-initialization tasks for the application.
 
     Parameters:
-    app (Application[ExtBot[None], CallbackContext, ADict, ADict, ADict, JobQueue]): `PTB Application object`
+    .. (Application[ExtBot[None], CallbackContext, ADict, ADict, ADict, JobQueue])::
+        `PTB Application object`
 
     Returns:
     None: no returns
@@ -27,17 +28,20 @@ async def post_init(app: APP_TYPE):
 
     assert app.job_queue
 
+    drops: set[int] = set()
     for id in app.chat_data.keys():
         try:
             await app.bot.get_chat(id)
             keys = app.chat_data[id].get('keywords')
         except Exception:
+            drops.add(id)
             continue
 
+        drops.add(id) if not keys else None
         run = lambda q, cb, time, id: q.run_daily(cb, time, WORKDAYS, chat_id=id)
         [run(app.job_queue, handlers.search, T, id) for T in TIME_REQUESTS if keys]
-        app.job_queue.run_daily(handlers.daily_check, CHECK_TIME, WORKDAYS)
 
+    [(app.drop_chat_data(id), app.drop_user_data(id)) for id in drops]
     await app.bot.set_my_commands(COMMANDS)
 
 
