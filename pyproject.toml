@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "telegram-busca-vagas-bot"
-version = "1.5.1"
+version = "1.6.0"
 description = ""
 authors = ["Maksuel Nascimento <mk-nascimento@hotmail.com>"]
 readme = "README.md"
@@ -10,6 +10,7 @@ python = "^3.10"
 python-dotenv = "^1.0.1"
 python-telegram-bot = { extras = ["job-queue"], version = "^20.7" }
 requests = "~2.31"
+pydantic = "^2.8.2"
 
 
 [tool.poetry.group.dev.dependencies]

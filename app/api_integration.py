@@ -1,9 +1,10 @@
+import json
 import logging
 
 import requests
 
 from app.exceptions import ExtendedException
-from app.models import AllowedQueryParams, ApiResponse, Job, Pagination
+from app.models import AllowedQueryParams, ApiResponse, Job
 from app.utils import is_after_last_request
 
 logger = logging.getLogger(__name__)
@@ -26,33 +27,25 @@ class RequestAPI:
 
                 r = client.get(url, params=params)
                 r.raise_for_status()
-                res = ApiResponse(**r.json())
+                res = ApiResponse.model_validate(json.loads(r.text))
 
-                page = Pagination(**res.pagination)
-                offset, total = page.offset, page.total
-
-                while int(offset) < int(total):
+                offset, total = res.pagination.offset, res.pagination.total
+                while offset < total:
                     params.update({off: offset, workplace: 'hybrid,remote'})
                     params.pop(limit, None)
 
                     r = client.get(url, params=params)
                     r.raise_for_status()
-                    res = ApiResponse(**r.json())
+                    res = ApiResponse.model_validate(json.loads(r.text))
 
-                    dates: list[str] = [d['publishedDate'] for d in res.data]
+                    dates: list[str] = [d.published_date for d in res.data]
                     validation = [is_after_last_request(d) for d in dates]
                     if all(validation):
                         data.extend(res.data)
                         offset += 10
-                        page = res.pagination
                     else:
-                        data.extend(
-                            [
-                                d
-                                for d in res.data
-                                if (is_after_last_request(d['publishedDate']))
-                            ]
-                        )
+                        after = is_after_last_request
+                        data.extend([d for d in res.data if after(d.published_date)])
                         offset = total
 
                 return data

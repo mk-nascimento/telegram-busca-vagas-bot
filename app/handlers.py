@@ -57,15 +57,14 @@ async def search(context: ContextTypes.DEFAULT_TYPE) -> None:
     for job_name in keywords:
         jobs = await api.search_jobs(job_name)
         for job in jobs:
-            found_on: list[str] = job.setdefault('keywords', list())
-            work = 'workplaceType'
+            workplace = job.workplace_type
 
-            ids = {item['id'] for item in split[job[work]]}
-            if job['id'] not in ids:
-                found_on.append(job_name)
-                split[job[work]].append(job)
+            ids = {item.id for item in split[workplace]}
+            if job.id not in ids:
+                job.keywords.append(job_name)
+                split[workplace].append(job)
             else:
-                job = next((o for o in split[job[work]] if o['id'] == job['id']), {})
+                job = next((o for o in split[workplace] if o['id'] == job.id), {})
                 job['keywords'].append(job_name)
 
         if not jobs:
