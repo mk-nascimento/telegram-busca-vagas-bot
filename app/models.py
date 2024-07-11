@@ -1,52 +1,52 @@
-from dataclasses import dataclass, field
 from enum import Enum
+from typing import Optional
 
-import httpcore
-import requests
-
-
-@dataclass
-class Badges:
-    friendlyBadge: bool  # NOSONAR
+from pydantic import BaseModel, ConfigDict, Field
 
 
-@dataclass
-class Job(dict):
+class Badges(BaseModel):
+    friendly_badge: bool = Field(..., alias='friendlyBadge')
+
+
+class Job(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True, from_attributes=True)
+
     id: int
-    companyId: int
+    company_id: int = Field(..., alias='companyId')
     name: str
     description: str
-    careerPageId: int
-    careerPageName: str
-    careerPageLogo: httpcore.URL
+    keywords: list[str] = Field(..., default_factory=list)
+    career_page_id: int = Field(..., alias='careerPageId')
+    career_page_name: str = Field(..., alias='careerPageName')
+    career_page_logo: str = Field(..., alias='careerPageLogo')
+    career_page_url: str = Field(..., alias='careerPageUrl')
     type: str
-    publishedDate: str
-    applicationDeadline: str
-    isRemoteWork: bool
+    published_date: str = Field(..., alias='publishedDate')
+    application_dead_line: Optional[str] = Field(..., alias='applicationDeadline')
+    remote: bool = Field(..., alias='isRemoteWork')
     city: str
     state: str
     country: str
-    jobUrl: httpcore.URL
+    job_url: str = Field(..., alias='jobUrl')
     badges: Badges
     disabilities: bool
-    workplaceType: str
-    careerPageUrl: httpcore.URL
+    workplace_type: str = Field(..., alias='workplaceType')
 
 
-@dataclass
-class Pagination(dict):
+class Pagination(BaseModel):
     offset: int
     limit: int
     total: int
 
 
-@dataclass
-class ApiResponse(requests.models.Response):
+class ApiResponse(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True, from_attributes=True)
+
     pagination: Pagination
-    data: list[Job] = field(default_factory=list)
+    data: list[Job] = Field(default_factory=list)
 
 
-class AllowedQueryParams(Enum):
+class AllowedQueryParams(str, Enum):
     JOB_NAME = 'jobName'
     LIMIT = 'limit'
     OFFSET = 'offset'
