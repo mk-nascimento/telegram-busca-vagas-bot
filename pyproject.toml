@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "telegram-busca-vagas-bot"
-version = "1.5.0"
+version = "1.5.1"
 description = ""
 authors = ["Maksuel Nascimento <mk-nascimento@hotmail.com>"]
 readme = "README.md"
@@ -24,7 +24,7 @@ line-length = 88
 
 [tool.ruff]
 line-length = 88
-exclude = ['.venv']
+extend-exclude = ['.*']
 
 [tool.isort]
 profile = "black"
